@@ -67,8 +67,14 @@ function getSubnetMasksList() {
     return subnetMasks
 }
 
-function init() {
+function refreshSubnet() {
     var subnetSelect = document.getElementById('subnetSelect')
+
+    var optionsLength = subnetSelect.options.length
+
+    while(subnetSelect.options.length != 0) {
+        subnetSelect.options[0] = null
+    }
 
     var subnetMasks = getSubnetMasksList()
 
@@ -83,4 +89,8 @@ function init() {
 
         subnetSelect.appendChild(option)
     }
+}
+
+function init() {
+    refreshSubnet()
 }
