@@ -1,11 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Hello, world</title>
+    <title>IP Subnet calulator</title>
 </head>
 
 <body>
-    Hello, world
+    <p>
+        <form id="radioForm">
+            Network class
+            <input type="radio" name="networkClass" value="any" checked>Any
+            <input type="radio" name="networkClass" value="a">A
+            <input type="radio" name="networkClass" value="b">B
+            <input type="radio" name="networkClass" value="c">C
+        </form>
+    </p>
+
+    <p>
+        Subnet
+        <select id="subnetSelect"></select>
+    </p>
+
+    <p>
+        IP address
+        <input type="text" id="ipAddess" name="ipAddress" value="10.0.0.1">
+    </p>
+
+    <p>
+        <input type="button" value="Calulate">
+    </p>
+
+    <p>
+        <table id="infoTable"></table>
+    </p>
+            
 </body>
 
 </html>
