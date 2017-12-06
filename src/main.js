@@ -91,26 +91,21 @@ function stringToNum(s) {
     return ipToNum(stringToIP(s))
 }
 
-function getNetworkAddress(payload) {
-    var hostNum = ipToNum(stringToIP(payload['ipAddr']))
-    var subnetNum = ipToNum(stringToIP(payload['subnet']))
-    var netAddr = {}
+function getNetworkNum(payload) {
+    var hostNum = payload['hostNum']
+    var subnetNum = payload['subnetNum']
     var networkNum
 
     networkNum = hostNum & subnetNum
 
-    netAddr = ipToString(numToIP(networkNum))
-
-    return netAddr
+    return networkNum
 }
 
-function getBroadcastAddress(payload) {
-    var netAddr = getNetworkAddress(payload)
-    var boardcastAddr = numToString(stringToNum(netAddr) | ((~(stringToNum(payload['subnet']))) & byteMask))
+function getBroadcastNum(payload) {
+    var networkNum = payload['networkNum']
+    var broadcastNum = networkNum | ((~payload['subnetNum']) & byteMask)
 
-    console.log(boardcastAddr)
-
-    return boardcastAddr
+    return broadcastNum
 }
 
 function getNetworkClassRadio() {
@@ -182,10 +177,15 @@ function render(payload) {
         infoTable.removeChild(infoTable.lastChild)
     }
 
-    info['IP Address:'] = payload['ipAddr']
-    info['Network Address:'] = getNetworkAddress(payload)
-    info['Broadcast Address:'] = getBroadcastAddress(payload)
-    info['Usable Host IP Range:'] = numToString(stringToNum(info['Network Address:']) + 1) + " - " + numToString(stringToNum(info['Broadcast Address:']) - 1)
+    payload['networkNum'] = getNetworkNum(payload)
+    payload['broadcastNum'] = getBroadcastNum(payload)
+    payload['usableHostStart'] = payload['networkNum'] + 1
+    payload['usableHostEnd'] = payload['broadcastNum'] - 1
+
+    info['IP Address:'] = numToString(payload['hostNum'])
+    info['Network Address:'] = numToString(payload['networkNum'])
+    info['Broadcast Address:'] = numToString(payload['broadcastNum'])
+    info['Usable Host IP Range:'] = numToString(payload['usableHostStart']) + " - " + numToString(payload['usableHostEnd'])
 
     for(element in info) {
         var row = document.createElement('tr')
@@ -203,12 +203,12 @@ function render(payload) {
 }
 
 function getForm() {
-    var ipAddr = document.getElementById('ipAddress')
+    var hostAddr  = document.getElementById('ipAddress')
     var subnetSelect = document.getElementById('subnetSelect')
     var payload = {}
 
-    payload['ipAddr'] = ipAddr.value
-    payload['subnet'] = subnetSelect.options[subnetSelect.selectedIndex].value
+    payload['hostNum'] = stringToNum(hostAddr.value)
+    payload['subnetNum'] = stringToNum(subnetSelect.options[subnetSelect.selectedIndex].value)
 
     render(payload)
 }
