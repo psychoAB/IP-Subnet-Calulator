@@ -5,6 +5,28 @@ var bMask = 0x00FF0000
 var cMask = 0x0000FF00
 var dMask = 0x000000FF
 
+var info = {
+            'IP Address:' : null,
+            'Network Address:' : null,
+            'Usable Host IP Range:' : null,
+            'Broadcast Address:' : null,
+            'Total Number of Hosts:' : null,
+            'Number of Usable Hosts:' : null,
+            'Subnet Mask:' : null,
+            'Wildcard Mask:' : null,
+            'Binary Subnet Mask:' : null,
+            'IP Class:' : null,
+            'CIDR Notation:' : null,
+            'IP Type:' : null,
+            'SPACER' : '',
+            'Short:' : null,
+            'Binary ID:' : null,
+            'Integer ID:' : null,
+            'HEX ID:' : null,
+            'in-addr.arpa:': null,
+            'IPv4 Mapped Address:' : null,
+            '6to4 Prefix:' : null}
+
 function numToIP(num) {
     var ipAddr = {}
 
@@ -61,7 +83,15 @@ function stringToIP(s) {
     return ipAddr
 }
 
-function getNetWorkAddress(payload) {
+function numToString(num) {
+    return ipToString(numToIP(num))
+}
+
+function stringToNum(s) {
+    return ipToNum(stringToIP(s))
+}
+
+function getNetworkAddress(payload) {
     var hostNum = ipToNum(stringToIP(payload['ipAddr']))
     var subnetNum = ipToNum(stringToIP(payload['subnet']))
     var netAddr = {}
@@ -72,6 +102,15 @@ function getNetWorkAddress(payload) {
     netAddr = ipToString(numToIP(networkNum))
 
     return netAddr
+}
+
+function getBroadcastAddress(payload) {
+    var netAddr = getNetworkAddress(payload)
+    var boardcastAddr = numToString(stringToNum(netAddr) | ((~(stringToNum(payload['subnet']))) & byteMask))
+
+    console.log(boardcastAddr)
+
+    return boardcastAddr
 }
 
 function getNetworkClassRadio() {
@@ -117,10 +156,8 @@ function getSubnetMasksList() {
 function refreshSubnet() {
     var subnetSelect = document.getElementById('subnetSelect')
 
-    var optionsLength = subnetSelect.options.length
-
-    while(subnetSelect.options.length != 0) {
-        subnetSelect.options[0] = null
+    while(subnetSelect.hasChildNodes()) {
+        subnetSelect.removeChild(subnetSelect.lastChild)
     }
 
     var subnetMasks = getSubnetMasksList()
@@ -140,14 +177,15 @@ function refreshSubnet() {
 
 function render(payload) {
     var infoTable = document.getElementById('infoTable')
-    var info = {}
 
     while(infoTable.hasChildNodes()) {
         infoTable.removeChild(infoTable.lastChild)
     }
 
     info['IP Address:'] = payload['ipAddr']
-    info['Network Address:'] = getNetWorkAddress(payload)
+    info['Network Address:'] = getNetworkAddress(payload)
+    info['Broadcast Address:'] = getBroadcastAddress(payload)
+    info['Usable Host IP Range:'] = numToString(stringToNum(info['Network Address:']) + 1) + " - " + numToString(stringToNum(info['Broadcast Address:']) - 1)
 
     for(element in info) {
         var row = document.createElement('tr')
