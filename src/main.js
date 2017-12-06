@@ -117,10 +117,8 @@ function getSubnetMasksList() {
 function refreshSubnet() {
     var subnetSelect = document.getElementById('subnetSelect')
 
-    var optionsLength = subnetSelect.options.length
-
-    while(subnetSelect.options.length != 0) {
-        subnetSelect.options[0] = null
+    while(subnetSelect.hasChildNodes()) {
+        subnetSelect.removeChild(subnetSelect.lastChild)
     }
 
     var subnetMasks = getSubnetMasksList()
