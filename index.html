@@ -2,8 +2,19 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+
     <title>IP Subnet calulator</title>
+
     <script src="src/main.js"></script>
+
+    <style>
+        table, tr, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+
 </head>
 
 <body onload=init()>
@@ -31,10 +42,17 @@
         <input type="button" onclick="getForm()" value="Calulate">
     </p>
 
+    <br>
+
     <p>
         <table id="infoTable"></table>
     </p>
-            
+
+    <br>
+
+    <p id="ipTablePara"></p>
+
+    <table id="ipTable"></table>
 </body>
 
 </html>
