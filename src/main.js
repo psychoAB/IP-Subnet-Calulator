@@ -96,6 +96,21 @@ function stringToNum(s) {
     return ipToNum(stringToIP(s))
 }
 
+function getArpa(payload) {
+    var ipAddr = numToIP(payload['hostNum'])
+    var temp
+
+    temp = ipAddr[0]
+    ipAddr[0] = ipAddr[3]
+    ipAddr[3] = temp
+
+    temp = ipAddr[1]
+    ipAddr[1] = ipAddr[2]
+    ipAddr[2] = temp
+
+    return ipToString(ipAddr) + '.in-addr.arpa'
+}
+
 function getIPType(payload) {
     for(ipRange in privateIP) {
         var start = stringToNum(privateIP[ipRange][0])
@@ -245,6 +260,7 @@ function render(payload) {
     payload['integerID'] = payload['hostNum'] >>> 0
     payload['binaryID'] = (payload['integerID']).toString(2)
     payload['hexID'] = '0x' + payload['integerID'].toString(16)
+    payload['arpa'] = getArpa(payload)
     
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
@@ -262,6 +278,7 @@ function render(payload) {
     info['Binary ID:'] = payload['binaryID']
     info['Integer ID:'] = payload['integerID']
     info['Hex ID:'] = payload['hexID']
+    info['in-addr.arpa:'] = payload['arpa']
 
     for(element in info) {
         var row = document.createElement('tr')
