@@ -22,7 +22,7 @@ var info = {
             'Short:' : null,
             'Binary ID:' : null,
             'Integer ID:' : null,
-            'HEX ID:' : null,
+            'Hex ID:' : null,
             'in-addr.arpa:': null,
             'IPv4 Mapped Address:' : null,
             '6to4 Prefix:' : null}
@@ -242,6 +242,9 @@ function render(payload) {
     payload['cidr'] = '/' + payload['subnetBitNum']
     payload['ipType'] = getIPType(payload)
     payload['short'] = numToString(payload['hostNum']) + ' ' + payload['cidr']
+    payload['integerID'] = payload['hostNum'] >>> 0
+    payload['binaryID'] = (payload['integerID']).toString(2)
+    payload['hexID'] = '0x' + payload['integerID'].toString(16)
     
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
@@ -256,6 +259,9 @@ function render(payload) {
     info['CIDR Notation:'] = payload['cidr']
     info['IP Type:'] = payload['ipType']
     info['Short:'] = payload['short']
+    info['Binary ID:'] = payload['binaryID']
+    info['Integer ID:'] = payload['integerID']
+    info['Hex ID:'] = payload['hexID']
 
     for(element in info) {
         var row = document.createElement('tr')
