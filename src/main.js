@@ -27,6 +27,11 @@ var info = {
             'IPv4 Mapped Address:' : null,
             '6to4 Prefix:' : null}
 
+var privateIP = [
+                    ['10.0.0.0', '10.255.255.255'],
+                    ['172.16.0.0', '172.31.255.255'],
+                    ['192.168.0.0', '192.168.255.255']]
+
 function numToIP(num) {
     var ipAddr = {}
 
@@ -89,6 +94,49 @@ function numToString(num) {
 
 function stringToNum(s) {
     return ipToNum(stringToIP(s))
+}
+
+function getIPType(payload) {
+    for(ipRange in privateIP) {
+        var start = stringToNum(privateIP[ipRange][0])
+        var end = stringToNum(privateIP[ipRange][1])
+
+        if(payload['hostNum'] >= start && payload['hostNum'] <= end) {
+            return 'Private'
+        }
+        console.log(start)
+        console.log(end)
+        console.log(payload['hostNum'])
+    }
+    
+    return 'Public'
+}
+
+function getIPClass(payload) {
+    if(payload['subnetBitNum'] >= 24) {
+        return 'C'
+    }
+    else if(payload['subnetBitNum'] >= 16) {
+        return 'B'
+    }
+    else if(payload['subnetBitNum'] >= 8) {
+        return 'A'
+    }
+    return 'None'
+}
+
+function getBinarySubnetMask(payload) {
+    var num = {}
+    var s
+    
+    num[0] = ((payload['subnetNum'] >>> 24) & dMask).toString(2)
+    num[1] = ((payload['subnetNum'] >>> 16) & dMask).toString(2)
+    num[2] = ((payload['subnetNum'] >>> 8) & dMask).toString(2)
+    num[3] = (payload['subnetNum'] & dMask).toString(2)
+
+    s = num[0] + '.' + num[1] + '.' + num[2] + '.' + num[3]
+    
+    return s
 }
 
 function getNetworkNum(payload) {
@@ -181,18 +229,33 @@ function render(payload) {
     payload['broadcastNum'] = getBroadcastNum(payload)
     payload['usableHostStart'] = payload['networkNum'] + 1
     payload['usableHostEnd'] = payload['broadcastNum'] - 1
-
+    payload['wildcard'] = (~payload['subnetNum']) & byteMask
+    payload['totalHostNum'] = payload['wildcard'] + 1
+    payload['usableHostNum'] = (payload['totalHostNum'] - 2 < 0) ? (0) : payload['totalHostNum'] - 2
+    payload['binarySubnetNum'] = getBinarySubnetMask(payload)
+    payload['ipClass'] = getIPClass(payload)
+    payload['cidr'] = '/' + payload['subnetBitNum']
+    payload['ipType'] = getIPType(payload)
+    
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
     info['Broadcast Address:'] = numToString(payload['broadcastNum'])
     info['Usable Host IP Range:'] = numToString(payload['usableHostStart']) + " - " + numToString(payload['usableHostEnd'])
+    info['Total Number of Hosts:'] = payload['totalHostNum']
+    info['Number of Usable Hosts:'] = payload['usableHostNum']
+    info['Subnet Mask:'] = numToString(payload['subnetNum'])
+    info['Wildcard Mask:'] = numToString(payload['wildcard'])
+    info['Binary Subnet Mask:'] = payload['binarySubnetNum']
+    info['IP Class:'] = payload['ipClass']
+    info['CIDR Notation:'] = payload['cidr']
+    info['IP Type:'] = payload['ipType']
 
     for(element in info) {
         var row = document.createElement('tr')
         var lable = document.createElement('td')
         var data = document.createElement('td')
 
-        lable.innerHTML = element
+        lable.innerHTML = (element == 'SPACER') ? '<br>' : element
         data.innerHTML = info[element]
         
         row.appendChild(lable)
@@ -209,6 +272,10 @@ function getForm() {
 
     payload['hostNum'] = stringToNum(hostAddr.value)
     payload['subnetNum'] = stringToNum(subnetSelect.options[subnetSelect.selectedIndex].value)
+    payload['subnetBitNum'] = subnetSelect.options[subnetSelect.selectedIndex].innerHTML
+
+    i = payload['subnetBitNum'].indexOf('/')
+    payload['subnetBitNum'] = payload['subnetBitNum'].substring(i + 1)
 
     render(payload)
 }
