@@ -104,9 +104,6 @@ function getIPType(payload) {
         if(payload['hostNum'] >= start && payload['hostNum'] <= end) {
             return 'Private'
         }
-        console.log(start)
-        console.log(end)
-        console.log(payload['hostNum'])
     }
     
     return 'Public'
@@ -244,6 +241,7 @@ function render(payload) {
     payload['ipClass'] = getIPClass(payload)
     payload['cidr'] = '/' + payload['subnetBitNum']
     payload['ipType'] = getIPType(payload)
+    payload['short'] = numToString(payload['hostNum']) + ' ' + payload['cidr']
     
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
@@ -257,6 +255,7 @@ function render(payload) {
     info['IP Class:'] = payload['ipClass']
     info['CIDR Notation:'] = payload['cidr']
     info['IP Type:'] = payload['ipType']
+    info['Short:'] = payload['short']
 
     for(element in info) {
         var row = document.createElement('tr')
