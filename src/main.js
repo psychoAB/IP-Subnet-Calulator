@@ -122,7 +122,7 @@ function getIPClass(payload) {
     else if(payload['subnetBitNum'] >= 8) {
         return 'A'
     }
-    return 'None'
+    return 'N/A'
 }
 
 function getBinarySubnetMask(payload) {
@@ -147,6 +147,13 @@ function getNetworkNum(payload) {
     networkNum = hostNum & subnetNum
 
     return networkNum
+}
+
+function getUsableHostIPRange(payload) {
+    if(payload['usableHostStart'] > payload['usableHostEnd']) {
+        return 'N/A'
+    }
+    return numToString(payload['usableHostStart']) + " - " + numToString(payload['usableHostEnd'])
 }
 
 function getBroadcastNum(payload) {
@@ -229,6 +236,7 @@ function render(payload) {
     payload['broadcastNum'] = getBroadcastNum(payload)
     payload['usableHostStart'] = payload['networkNum'] + 1
     payload['usableHostEnd'] = payload['broadcastNum'] - 1
+    payload['usableHostRange'] = getUsableHostIPRange(payload)
     payload['wildcard'] = (~payload['subnetNum']) & byteMask
     payload['totalHostNum'] = payload['wildcard'] + 1
     payload['usableHostNum'] = (payload['totalHostNum'] - 2 < 0) ? (0) : payload['totalHostNum'] - 2
@@ -240,7 +248,7 @@ function render(payload) {
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
     info['Broadcast Address:'] = numToString(payload['broadcastNum'])
-    info['Usable Host IP Range:'] = numToString(payload['usableHostStart']) + " - " + numToString(payload['usableHostEnd'])
+    info['Usable Host IP Range:'] = payload['usableHostRange']
     info['Total Number of Hosts:'] = payload['totalHostNum']
     info['Number of Usable Hosts:'] = payload['usableHostNum']
     info['Subnet Mask:'] = numToString(payload['subnetNum'])
