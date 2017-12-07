@@ -96,6 +96,17 @@ function stringToNum(s) {
     return ipToNum(stringToIP(s))
 }
 
+function leadingZero(s) {
+    return (s.length % 2 != 0) ? ('0' + s) : s
+}
+
+function getMappedAddr(payload) {
+    var hNum = (payload['integerID'] >>> 16) & (cMask | dMask)
+    var lNum = payload['integerID'] & (cMask | dMask)
+
+    return '::ffff:' + leadingZero(hNum.toString(16)) + '.' + leadingZero(lNum.toString(16))
+}
+
 function getArpa(payload) {
     var ipAddr = numToIP(payload['hostNum'])
     var temp
@@ -261,6 +272,7 @@ function render(payload) {
     payload['binaryID'] = (payload['integerID']).toString(2)
     payload['hexID'] = '0x' + payload['integerID'].toString(16)
     payload['arpa'] = getArpa(payload)
+    payload['mappedAddr'] = getMappedAddr(payload)
     
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
@@ -279,6 +291,7 @@ function render(payload) {
     info['Integer ID:'] = payload['integerID']
     info['Hex ID:'] = payload['hexID']
     info['in-addr.arpa:'] = payload['arpa']
+    info['IPv4 Mapped Address:'] = payload['mappedAddr']
 
     for(element in info) {
         var row = document.createElement('tr')
