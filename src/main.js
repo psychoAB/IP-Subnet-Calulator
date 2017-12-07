@@ -249,8 +249,8 @@ function render(payload) {
     info['Network Address:'] = numToString(payload['networkNum'])
     info['Broadcast Address:'] = numToString(payload['broadcastNum'])
     info['Usable Host IP Range:'] = payload['usableHostRange']
-    info['Total Number of Hosts:'] = payload['totalHostNum']
-    info['Number of Usable Hosts:'] = payload['usableHostNum']
+    info['Total Number of Hosts:'] = payload['totalHostNum'].toLocaleString('en')
+    info['Number of Usable Hosts:'] = payload['usableHostNum'].toLocaleString('en')
     info['Subnet Mask:'] = numToString(payload['subnetNum'])
     info['Wildcard Mask:'] = numToString(payload['wildcard'])
     info['Binary Subnet Mask:'] = payload['binarySubnetNum']
