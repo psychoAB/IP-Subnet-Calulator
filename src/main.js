@@ -135,6 +135,7 @@ function getIPList(payload) {
 
     while(networkList.length < payload['broadcastIPList'].length) {
         networkList.push(payload['broadcastIPList'][i])
+        i++
     }
 
     for(i = 0; i < payload['broadcastIPList'].length; i++) {
@@ -407,62 +408,65 @@ function render(payload) {
         infoTable.appendChild(row)
     }
     
-    var ipTablePara = document.getElementById('ipTablePara')
-    var ipTableTitle = document.createElement('h3')
-    var ipTable = document.getElementById('ipTable')
-    var ipList
-    var mockupIP
+    if(payload['usableHostNum'] > 0)
+    {
+        var ipTablePara = document.getElementById('ipTablePara')
+        var ipTableTitle = document.createElement('h3')
+        var ipTable = document.getElementById('ipTable')
+        var ipList
+        var mockupIP
 
-    while(ipTablePara.hasChildNodes()) {
-        ipTablePara.removeChild(ipTablePara.lastChild)
-    }
+        while(ipTablePara.hasChildNodes()) {
+            ipTablePara.removeChild(ipTablePara.lastChild)
+        }
 
-    while(ipTable.hasChildNodes()) {
-        ipTable.removeChild(ipTable.lastChild)
-    }
+        while(ipTable.hasChildNodes()) {
+            ipTable.removeChild(ipTable.lastChild)
+        }
 
-    payload['ipClassSubnetMask'] = getSubnetMaskOfNetworkClass(payload)
-    payload['hostNumMasked'] = payload['hostNum'] & payload['ipClassSubnetMask']
-    payload['ipEnd'] =  getIPEnd(payload)
-    payload['broadcastIPList'] = count(payload)
-    
-    ipList = getIPList(payload)
-    mockupIP = getMockupIP(payload)
+        payload['ipClassSubnetMask'] = getSubnetMaskOfNetworkClass(payload)
+        payload['hostNumMasked'] = payload['hostNum'] & payload['ipClassSubnetMask']
+        payload['ipEnd'] =  getIPEnd(payload)
+        payload['broadcastIPList'] = count(payload)
+        
+        ipList = getIPList(payload)
+        mockupIP = getMockupIP(payload)
 
-    ipTableTitle.innerHTML = 'All Possible ' + payload['cidr'] + ' Networks for ' + mockupIP
+        ipTableTitle.innerHTML = 'All Possible ' + payload['cidr'] + ' Networks for ' + mockupIP
 
-    ipTablePara.appendChild(ipTableTitle)
+        ipTablePara.appendChild(ipTableTitle)
 
-    var row = document.createElement('tr')
-    var networkAddr = document.createElement('td')
-    var usableHostRange = document.createElement('td')
-    var broadcastAddr = document.createElement('td')
-
-    networkAddr.innerHTML = 'Network Address'
-    usableHostRange.innerHTML = 'Usable Host Range'
-    broadcastAddr.innerHTML = 'Broadcast Address'
-
-    row.appendChild(networkAddr)
-    row.appendChild(usableHostRange)
-    row.appendChild(broadcastAddr)
-
-    ipTable.appendChild(row)
-
-    for(element in ipList) {
         var row = document.createElement('tr')
         var networkAddr = document.createElement('td')
         var usableHostRange = document.createElement('td')
         var broadcastAddr = document.createElement('td')
 
-        networkAddr.innerHTML = numToString(ipList[element]['network'])
-        usableHostRange.innerHTML = ipList[element]['range']
-        broadcastAddr.innerHTML = numToString(ipList[element]['broadcast'])
+        networkAddr.innerHTML = 'Network Address'
+        usableHostRange.innerHTML = 'Usable Host Range'
+        broadcastAddr.innerHTML = 'Broadcast Address'
 
         row.appendChild(networkAddr)
         row.appendChild(usableHostRange)
         row.appendChild(broadcastAddr)
 
         ipTable.appendChild(row)
+
+        for(element in ipList) {
+            var row = document.createElement('tr')
+            var networkAddr = document.createElement('td')
+            var usableHostRange = document.createElement('td')
+            var broadcastAddr = document.createElement('td')
+
+            networkAddr.innerHTML = numToString(ipList[element]['network'])
+            usableHostRange.innerHTML = ipList[element]['range']
+            broadcastAddr.innerHTML = numToString(ipList[element]['broadcast'])
+
+            row.appendChild(networkAddr)
+            row.appendChild(usableHostRange)
+            row.appendChild(broadcastAddr)
+
+            ipTable.appendChild(row)
+        }
     }
 }
 
