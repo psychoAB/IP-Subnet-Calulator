@@ -100,11 +100,14 @@ function leadingZero(s) {
     return (s.length % 2 != 0) ? ('0' + s) : s
 }
 
-function getMappedAddr(payload) {
-    var hNum = (payload['integerID'] >>> 16) & (cMask | dMask)
-    var lNum = payload['integerID'] & (cMask | dMask)
+function getHighNum(payload) {
+    return (payload['integerID'] >>> 16) & (cMask | dMask)
 
-    return '::ffff:' + leadingZero(hNum.toString(16)) + '.' + leadingZero(lNum.toString(16))
+}
+
+function getLowNum(payload) {
+    return payload['integerID'] & (cMask | dMask)
+
 }
 
 function getArpa(payload) {
@@ -272,7 +275,10 @@ function render(payload) {
     payload['binaryID'] = (payload['integerID']).toString(2)
     payload['hexID'] = '0x' + payload['integerID'].toString(16)
     payload['arpa'] = getArpa(payload)
-    payload['mappedAddr'] = getMappedAddr(payload)
+    payload['hNum'] = getHighNum(payload)
+    payload['lNum'] = getLowNum(payload)
+    payload['mappedAddr'] = '::ffff:' + leadingZero(payload['hNum'].toString(16)) + '.' + leadingZero(payload['lNum'].toString(16))
+    payload['sixToFour'] = '2002:' + leadingZero(payload['hNum'].toString(16)) + '.' + leadingZero(payload['lNum'].toString(16)) + '::/48'
     
     info['IP Address:'] = numToString(payload['hostNum'])
     info['Network Address:'] = numToString(payload['networkNum'])
@@ -292,6 +298,7 @@ function render(payload) {
     info['Hex ID:'] = payload['hexID']
     info['in-addr.arpa:'] = payload['arpa']
     info['IPv4 Mapped Address:'] = payload['mappedAddr']
+    info['6to4 Prefix:'] = payload['sixToFour']
 
     for(element in info) {
         var row = document.createElement('tr')
