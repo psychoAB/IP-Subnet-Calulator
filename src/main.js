@@ -110,6 +110,37 @@ function getLowNum(payload) {
 
 }
 
+function isIP(s) {
+    var ipAddr = {}
+    var delimiters = []
+
+    for(c in s) {
+        if(s.charAt(c) == '.') {
+            delimiters.push(parseInt(c))
+        }
+        else if(!Number.isInteger(parseInt(s.charAt(c)))) {
+            console.log('a')
+            return false
+        }
+    }
+
+    if(delimiters.length != 3) {
+        console.log('b')
+        return false
+    }
+
+    ipAddr = stringToIP(s)
+
+    for(element in ipAddr) {
+        if(ipAddr[element] > 255 || ipAddr[element] < 0) {
+            console.log('c')
+            return false
+        }
+    }
+    
+    return true
+}
+
 function getArpa(payload) {
     var ipAddr = numToIP(payload['hostNum'])
     var temp
@@ -284,7 +315,7 @@ function getSubnetMaskOfNetworkClass(payload) {
 
 function getNetworkClassRadio() {
     var radioForm = document.getElementById('radioForm')
-    var checkedRadio = null
+    var checkedRadio
     
     for(i = 0; i < radioForm.length; i++) {
         if(radioForm.elements[i].checked) {
@@ -482,7 +513,28 @@ function getForm() {
     i = payload['subnetBitNum'].indexOf('/')
     payload['subnetBitNum'] = payload['subnetBitNum'].substring(i + 1)
 
-    render(payload)
+    if(isIP(hostAddr.value)) {
+        var warning = document.getElementById('warning')
+
+        while(warning.hasChildNodes()) {
+            warning.removeChild(warning.lastChild)
+        }
+
+        render(payload)
+    }
+    else
+    {
+        var warning = document.getElementById('warning')
+        var warningText = document.createElement('h3')
+
+        while(warning.hasChildNodes()) {
+            warning.removeChild(warning.lastChild)
+        }
+
+        warningText.innerHTML = hostAddr.value + ' is wrong IP Address format ex. 192.168.0.1'
+
+        warning.appendChild(warningText)
+    }
 }
 
 function init() {
