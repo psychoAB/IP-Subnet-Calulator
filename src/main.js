@@ -1,3 +1,10 @@
+/*
+    Copyright (c) 2017 Natchanan Thongtem
+
+    This file is licensed under the MIT license.
+    See the LICENSE-mit.txt in the root directory of this project for more information.
+*/
+
 var byteMask = 0xFFFFFFFF
 
 var aMask = 0xFF000000
